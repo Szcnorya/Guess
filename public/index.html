@@ -1,0 +1,63 @@
+<html>
+<body>
+	<div class="container">
+		<div id=View1 hidden=true>
+			<div class="RoomArea flex-container">
+				<div class="Player">
+					<div class="PName">Nobody</div>
+					<div class="MasterSymbol">Master</div>
+					<div class="ReadySymbol">Ready</div>
+				</div>
+				<div class="Player">
+					<div class="PName">Nobody</div>
+					<div class="MasterSymbol">Master</div>
+					<div class="ReadySymbol">Ready</div>
+				</div>
+				<div class="Player">
+					<div class="PName">Nobody</div>
+					<div class="MasterSymbol">Master</div>
+					<div class="ReadySymbol">Ready</div>
+				</div>
+				<div class="Player">
+					<div class="PName">Nobody</div>
+					<div class="MasterSymbol">Master</div>
+					<div class="ReadySymbol">Ready</div>
+				</div>
+			</div>
+			<div class="OpArea">
+				<div class="ConfArea">
+					<div class="Conf">
+						<span>名称：</span>
+						<div id=uname contentEditable="true" class="Box">Nobody</div>
+					</div>
+					<div class="Conf">
+						<span>时限：</span>
+						<div id=timelimit class="Box">180</div>
+					</div>
+				</div>
+				<div class="IntArea" align="center">
+					<div id=ready class="Button">准备</div>
+				</div>
+			</div>
+		</div>
+		<div id=View2 hidden="true">
+			<div class="infoArea flex-container">
+				<div id=time>173s</div>
+				<div id=credit>0/0</div>
+			</div>
+			<div class="wordArea flex-container">
+				<div id=word>巴格达</div>
+			</div>
+			<div class="OpArea flex-container">
+				<div id=correct class="Button">正确</div>
+				<div id=skip class="Button">跳过</div>
+			</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script src="socket.io.slim.js"></script>
+<script type="text/javascript" src="jquery-3.3.1.slim.min.js"></script>
+<script src="client.js"></script>
+<link rel="stylesheet" type="text/css" href="index.css" />
+</html>

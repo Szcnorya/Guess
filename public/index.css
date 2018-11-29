@@ -1,0 +1,101 @@
+.container{
+   width: 800px;
+   height: 600px; 
+}
+.RoomArea{
+	height : 70%;
+}
+.OpArea{
+	height: 30%;
+}
+.ConfArea{
+	width: 40%;
+	display:inline-block;
+}
+.IntArea{
+	width: 40%;
+	display:inline-block;
+}
+.Conf{
+	padding-top: 4px;
+	padding-left: 4px;
+}
+.unavailable-block{
+	background-color: #AAAAAA;
+}
+.Player{
+	width:180px;
+	height:300px;
+	border:2px solid;
+	border-radius:5px;
+	box-shadow: 2px 2px 2px #888888;
+}
+.Box{
+	display:inline-block;
+	width:120px;
+	text-align: center;
+	border:2px solid;
+	border-radius:5px;
+
+	box-shadow: 2px 2px 2px #888888;
+}
+.Button{
+	padding-top: 5px;
+	width:120px;
+	height: 40px;
+	text-align: center;
+	border:2px solid;
+	border-radius:25px;
+	box-shadow: 2px 2px 2px #888888;
+}
+.ReadySymbol{
+	color: red;
+	font-size:40px;
+	text-shadow: 2px 2px 2px #FF0000;
+	transform: translate(30px,60px) rotate(-10deg);
+}
+.MasterSymbol{
+	color: red;
+	font-size:40px;
+	text-shadow: 2px 2px 2px #FF0000;
+	transform: translate(30px,60px) rotate(-10deg);
+}
+.PName{
+	font-weight:bold;
+	text-align: center;
+	text-shadow: 1px 1px 1px #888888;
+	font-size:30px;
+}
+.flex-container{
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	flex-direction: row；
+	flex-wrap: nowrap；
+	flex-flow: row wrap; 
+	justify-content: space-around; 
+}
+.infoArea{
+	height : 10%;
+	justify-content: space-between;
+}
+.wordArea{
+	align-items:center;
+	justify-content: center;
+	height : 60%;
+}
+
+#time{
+	font-weight:bold;
+	font-size:30px;
+}
+#credit{
+	font-weight:bold;
+	font-size:30px;
+}
+#word{
+	font-weight:bold;
+	font-size:60px;
+}

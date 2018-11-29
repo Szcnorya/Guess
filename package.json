@@ -1,0 +1,20 @@
+{
+  "name": "sayandguess",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "csv-parse": "^2.5.0",
+    "express": "^4.16.3",
+    "fs": "^0.0.1-security",
+    "should": "^13.2.3",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
