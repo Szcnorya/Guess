@@ -8,12 +8,12 @@ The watchers need to hint the guesser without explicitly say any part of the wor
 It is recommendded to have a sideway voice chating software to help the game. Audio chating feature is not considered worth to implemented in this game.
 
 ## Dependency
--- Node.js
--- NPM
--- Socket.io
--- express
--- csv-parse
--- fs
+* Node.js
+* NPM
+* Socket.io
+* express
+* csv-parse
+* fs
 
 ## Deployment
 
@@ -33,6 +33,6 @@ Just change "/guess" to the target path you want to use.
 
 ## Future Target
 
--- Multi-dictionary support
--- Reconnect feature
--- Optimized frontend and backend(for better gameflow)
+* Multi-dictionary support
+* Reconnect feature
+* Optimized frontend and backend(for better gameflow)
