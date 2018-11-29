@@ -1,8 +1,9 @@
 var io = io('');
 var GameStatus = {
+	// RoomRelated
 	playerId : -1,
 	myInfo : {},
-	state : "InRoom",
+	state : "Outside",
 	timelimit : 180,
 	playersInfo : [],
 	// Only available in Gaming state
@@ -42,6 +43,8 @@ io.on("gameInfo",(info) => {
 io.on("gameEnd",()=>{
 	GameStatus.state = "InRoom";
 });
+
+
 function bindInteractions(){
 	$('#timelimit').off("click");
 	$('#timelimit').click(()=>{
@@ -68,7 +71,14 @@ function bindInteractions(){
 	});
 }
 function render(){
-	if(GameStatus.state=="InRoom"){
+	if(GameStatus.state=="Outside"){
+		var ID = window.prompt("Please input the room ID you want to join","");
+		var rid = parseInt(ID);
+		io.emit("join",rid);
+		GameStatus.state = "InRoom";
+		setTimeout(render,500);
+	}
+	else if(GameStatus.state=="InRoom"){
 		$("#View1").show();
 		$("#View2").hide();
 		// Update room info
@@ -126,7 +136,7 @@ function render(){
 				}
 			}
 		}
-		setTimeout(render,33);
+		setTimeout(render,300);
 	}
 	else{
 		$("#View2").show();
