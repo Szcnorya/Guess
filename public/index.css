@@ -30,6 +30,18 @@
 	border-radius:5px;
 	box-shadow: 2px 2px 2px #888888;
 }
+
+.InitButton{
+	display:inline-block;
+	width:300px;
+	height:300px;
+	text-align: center;
+	border:2px solid;
+	border-radius:5px;
+
+	box-shadow: 2px 2px 2px #888888;
+}
+
 .Box{
 	display:inline-block;
 	width:120px;

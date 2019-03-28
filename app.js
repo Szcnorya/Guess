@@ -368,7 +368,7 @@ io.on('connection', function (socket) {
       return;
     }
     clientState.playerName = newName;
-    notifyRoomInfo(roomid);
+    notifyRoomInfo(roomId);
   });
   socket.on("Ready",() => {
     if(!sanityCheckR(clientState,roomId)){
