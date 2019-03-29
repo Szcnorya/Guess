@@ -32,9 +32,8 @@ var playerState = {};
 var roomStates = {}
 var viableTimeLimit = [60,120,180,360];
 
-var wordList;
-
-
+var defaultWordListName = "";
+var wordLists = {"" : []};
 
 // ----------------------------------------------------------------
 // -- Configuration funcs
@@ -44,34 +43,51 @@ function parseGameConfiguration(filename = "game.conf"){
   // Parse viableTimeLimit, DictionaryList from game.conf
   fs.readFile(filename,{encoding : "UTF-8",flag: "r"}, (err,fd) => {
     if(err) throw err;
-    var input = fd;
+    let input = fd;
     conf = JSON.parse(input);
-    cwordList = conf["wordLists"][0][1];
-    loadVocabulary(cwordList);
+    Promise.all(conf["wordLists"].map((v,i) => loadVocabulary(v[0],v[1])))
+              .then((resolve,reject) => {
+                let tmp = Object.keys(wordLists);
+                if(tmp.length==0) reject(-1);
+                // Temporary pick the first
+                defaultWordListName = tmp[1];
+                resolve(0);
+              });
     timeLimits = conf["viableTimeLimit"];
     viableTimeLimit = timeLimits;
   }); 
 }
 
-function loadVocabulary(filename){
-  fs.readFile(filename,{encoding : "UTF-8",flag: "r"}, (err,fd) => {
-    if(err) throw err;
-    var input = fd;
-    wordList = parse(input)[0];
-  }); 
+// Parse to in memory wordLists
+function loadVocabulary(listname,filename){
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename,{encoding : "UTF-8",flag: "r"}, (err,fd) => {
+      if(err) reject(err);
+      let input = fd;
+      wordLists[listname] = parse(input)[0];
+      resolve(0);
+    }); 
+  });
 }
+
+// ----------------------------------------------------------------
+// -- DB related funcs
+// ----------------------------------------------------------------
+// TODO
+
 
 // ----------------------------------------------------------------
 // -- RoomRelated funcs
 // ----------------------------------------------------------------
 
 function initRoomInfo(rid){
-  var roomInfo =
+  let roomInfo =
   {
     playerList : [],
     timelimit : 60,
     TLCur : 0,
     noDupMode : false,
+    curWordListName : defaultWordListName,
     gameInfo : {}
   };
   setRoomInfo(rid,roomInfo);
@@ -109,7 +125,7 @@ function setPlayerState(pid,state){
 // TODO: Add room feature & control broadcast domain
 
 function registerNewPlayer(socket){
-  var newclient = {
+  let newclient = {
     playerID : globalIDStamp,
     // This is a replicated pointer from RoomInfo.playerList, Consistency should be cared
     currentRoom : -1,
@@ -127,13 +143,13 @@ function registerNewPlayer(socket){
 }
 
 function playerLeaveRoom(pid){
-  var rid = getPlayerState(pid).currentRoom;
+  let rid = getPlayerState(pid).currentRoom;
   if(rid == -1){
     return;
   }
-  var roomInfo = getRoomInfo(rid);
+  let roomInfo = getRoomInfo(rid);
   roomInfo.playerList = remove(roomInfo.playerList,pid);
-  var player = getPlayerState(pid);
+  let player = getPlayerState(pid);
   player.state = "Outside";
   player.playerRole = "";
   player.currentRoom = -1;
@@ -145,8 +161,8 @@ function playerLeaveRoom(pid){
 }
 
 function playerJoinRoom(pid,rid){
-  var plyState = getPlayerState(pid);
-  var roomInfo = getRoomInfo(rid);
+  let plyState = getPlayerState(pid);
+  let roomInfo = getRoomInfo(rid);
   playerLeaveRoom(pid);
   // Join new Room
   if(roomInfo.playerList.length==0){
@@ -161,10 +177,10 @@ function playerJoinRoom(pid,rid){
 function notifyRoomInfo(rid){
   // Pushing all info to client
   playerBuf = []
-  var roomInfo = getRoomInfo(rid);
-  for(var i=0;i<roomInfo.playerList.length;i++){
-    var id = roomInfo.playerList[i];
-    var pinfo = getPlayerState(id);
+  let roomInfo = getRoomInfo(rid);
+  for(let i=0;i<roomInfo.playerList.length;i++){
+    let id = roomInfo.playerList[i];
+    let pinfo = getPlayerState(id);
     playerBuf.push({
       playerID : pinfo.playerID,
       playerName : pinfo.playerName,
@@ -175,7 +191,6 @@ function notifyRoomInfo(rid){
       playerRole : pinfo.playerRole
     });
   }
-  // FIXME: Change this to a local broadcast inside room
   io.to(roomchannel(rid)).emit('roomInfo',{
     timelimit : roomInfo.timelimit,
     players : playerBuf
@@ -183,23 +198,23 @@ function notifyRoomInfo(rid){
 }
 
 function reelectMaster(rid){
-  var roomInfo = getRoomInfo(rid);
-  var len = roomInfo.playerList.length;
+  let roomInfo = getRoomInfo(rid);
+  let len = roomInfo.playerList.length;
   if(len==0){
     // It's no point to do anymore.
     return;
   }
-  var target = Math.floor((Math.random()*len));
-  var id = roomInfo.playerList[target];
+  let target = Math.floor((Math.random()*len));
+  let id = roomInfo.playerList[target];
   playerState[id].isRoomMaster = true;
   playerState[id].isReady4Gaming = true;
 }
 
 function removePlayer(pid){
-  var rid = getPlayerState(pid).currentRoom;
-  var roomInfo = getRoomInfo(rid);
+  let rid = getPlayerState(pid).currentRoom;
+  let roomInfo = getRoomInfo(rid);
   roomInfo.playerList = remove(roomInfo.playerList,pid);
-  var player = getPlayerState(pid);
+  let player = getPlayerState(pid);
   setPlayerState(pid,null);
   if(player.isRoomMaster){
     //When RoomMaster was removed we need reelection
@@ -209,14 +224,14 @@ function removePlayer(pid){
 }
 
 function isAllReady(rid){
-  var roomInfo = getRoomInfo(rid);
+  let roomInfo = getRoomInfo(rid);
   // If only one player in room, refuse to start
   if(roomInfo.playerList.length<2){
     return false;
   }
-  for(var i=0;i<roomInfo.playerList.length;i++){
-    var id=roomInfo.playerList[i];
-    var pinfo = getPlayerState(id);
+  for(let i=0;i<roomInfo.playerList.length;i++){
+    let id=roomInfo.playerList[i];
+    let pinfo = getPlayerState(id);
     if(pinfo.isReady4Gaming==false){
       return false;
     }
@@ -224,8 +239,8 @@ function isAllReady(rid){
   return true;
 }
 function initGameInfo(rid){
-  var roomInfo = getRoomInfo(rid);
-  var gameInfo = {
+  let roomInfo = getRoomInfo(rid);
+  let gameInfo = {
     time : roomInfo.timelimit,
     wordGuessed : {},
     correctNum : 0,
@@ -234,24 +249,27 @@ function initGameInfo(rid){
   setGameInfo(rid,gameInfo);
 }
 
-function getNextWord(){
-  var len = wordList.length;
-  var target = Math.floor((Math.random()*len));
+function getNextWord(rid){
+  let roomInfo = getRoomInfo(rid);
+  const wordList = wordLists[roomInfo.curWordListName];
+  let len = wordList.length;
+  let target = Math.floor((Math.random()*len));
   return wordList[target];
 }
+
 function notifyNextWord(rid){
-  var roomInfo = getRoomInfo(rid);
-  var gameInfo = getGameInfo(rid);
-  var nextword = getNextWord();
+  let roomInfo = getRoomInfo(rid);
+  let gameInfo = getGameInfo(rid);
+  let nextword = getNextWord(rid);
   if(roomInfo.noDupMode){
     while(!gameInfo.wordGuessed[nextword]){
-      nextword = getNextWord();
+      nextword = getNextWord(rid);
     }
   }
   gameInfo.wordGuessed[nextword] = true;
-  for(var i=0;i<roomInfo.playerList.length;i++){
-    var id=roomInfo.playerList[i];
-    var pinfo = getPlayerState(id);
+  for(let i=0;i<roomInfo.playerList.length;i++){
+    let id=roomInfo.playerList[i];
+    let pinfo = getPlayerState(id);
     if(pinfo.playerRole!="Player"){
       pinfo._socket.emit('wordToGuess',nextword);
     }
@@ -262,24 +280,22 @@ function notifyNextWord(rid){
 }
 function notifyGameEnd(rid){
   notifyGameInfo(rid);
-  // FIXME: Change this to a local broadcast inside room
   io.to(roomchannel(rid)).emit('gameEnd',"");
   cleanUpGame(rid);
 }
 function notifyGameInfo(rid){
   // TODO: Pushing time & credit update
-  // FIXME: Change this to a local broadcast inside room
   io.to(roomchannel(rid)).emit('gameInfo',getGameInfo(rid));
 }
 
 function initGame(rid){
   // Select the player
-  var roomInfo = getRoomInfo(rid);
-  var len = roomInfo.playerList.length;
-  var target = Math.floor((Math.random()*len));
-  for(var i=0;i<len;i++){
-    var id = roomInfo.playerList[i];
-    var player = getPlayerState(id);
+  let roomInfo = getRoomInfo(rid);
+  let len = roomInfo.playerList.length;
+  let target = Math.floor((Math.random()*len));
+  for(let i=0;i<len;i++){
+    let id = roomInfo.playerList[i];
+    let player = getPlayerState(id);
     player.state = "Gaming";
     if(i!=target){
       player.playerRole = "Watcher";
@@ -292,11 +308,11 @@ function initGame(rid){
 }
 
 function cleanUpGame(rid){
-  var roomInfo = getRoomInfo(rid);
+  let roomInfo = getRoomInfo(rid);
   initGameInfo(rid);
-  for(var i=0;i<roomInfo.playerList.length;i++){
-    var id=roomInfo.playerList[i];
-    var pinfo = getPlayerState(id);
+  for(let i=0;i<roomInfo.playerList.length;i++){
+    let id=roomInfo.playerList[i];
+    let pinfo = getPlayerState(id);
     pinfo.state = "InRoom";
     pinfo.playerRole = "";
   }
@@ -304,7 +320,7 @@ function cleanUpGame(rid){
 }
 
 function clockTimeout(rid){
-  var gameInfo = getGameInfo(rid);
+  let gameInfo = getGameInfo(rid);
   if(gameInfo.time!=0){
       gameInfo.time-=1;
       notifyGameInfo(rid);
@@ -320,8 +336,7 @@ function startGame(rid){
   initGameInfo(rid);
   notifyGameInfo(rid);
   // Start
-  setTimeout(clockTimeout,1000,rid);
-  // FIXME: Local broadcast
+  setTimeout(clockTimeout,1000,rid)
   io.to(roomchannel(rid)).emit("Start","");
   notifyNextWord(rid);
 }
@@ -340,8 +355,8 @@ parseGameConfiguration("game.conf");
 // Register all request handling func
 io.on('connection', function (socket) {
   // Client States: Outside -> InRoom <--> Gaming 
-  var clientState = registerNewPlayer(socket);
-  var roomId = -1;
+  let clientState = registerNewPlayer(socket);
+  let roomId = -1;
   socket.emit("id",clientState.playerID);
   // Can notify the basic setting of players (or declined until player join room)
   socket.on("join",(rid) =>{
@@ -358,7 +373,7 @@ io.on('connection', function (socket) {
     if(!sanityCheckR(clientState,roomId)){
       return;
     }
-    var roomInfo = getRoomInfo(roomId);
+    let roomInfo = getRoomInfo(roomId);
     roomInfo.TLCur = (roomInfo.TLCur + 1) % viableTimeLimit.length;
     roomInfo.timelimit = viableTimeLimit[roomInfo.TLCur];
     notifyRoomInfo(roomId);
@@ -401,7 +416,7 @@ io.on('connection', function (socket) {
     if(!sanityCheckG(clientState,roomId)){
       return;
     }
-    var gameInfo = getGameInfo(roomId);
+    let gameInfo = getGameInfo(roomId);
     if(result=="Correct"){
       gameInfo.correctNum += 1;
       notifyNextWord(roomId); 
@@ -436,7 +451,7 @@ function sanityCheckG(clientState,roomId){
 // ----------------------------------------------------------------
 
 function remove(array,val){
-  var index = array.indexOf(val);
+  let index = array.indexOf(val);
   if (index > -1) {
     array.splice(index, 1);
   }
