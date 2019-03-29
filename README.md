@@ -10,6 +10,8 @@ It is recommendded to have a sideway voice chating software to help the game. Au
 ## Dependency
 * Node.js
 * NPM
+* Babel
+* React.js
 * Socket.io
 * express
 * csv-parse
