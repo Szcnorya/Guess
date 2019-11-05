@@ -1,11 +1,11 @@
 # Say and Guess
 
 ## Gameplay
-'Say and Guess' is a multiplayer game where one of the players is blinded and all other players are given the same word. The other players is called watcher and the sole blind player is called guesser.
+'Say and Guess' is a multiplayer game where one of the players is blinded and all the other players are given view of a shared word. The other players are called "watcher" and the sole blind player is called "guesser".
 
-The watchers need to hint the guesser without explicitly say any part of the word. The guesser need to use their hints to guess what the underlieing word is. Also, a timelimit is set for each guess to make the gameflow fluent. Everytime the guesser made a right guess, he got one point. Also, the guess could choose to pass this word and move on before the timelimit end. The goal is to reach the maximum point as possible.
+The watchers need to hint the guesser without explicitly refer to any part of the hidden word. The guesser need to use hints and imagination to guess what the hidden word is. Also, a timelimit is set for each word to make the gameflow smooth(in case that one word can not get through and the game struck). Every times the guesser makes a right guess, he gets one point. Also, the guesser could choose to skip word and move on regardless of the timelimit. The goal of the guesser is to gain as much point as possible.
 
-It is recommendded to have a sideway voice chating software to help the game. Audio chating feature is not considered worth to implemented in this game.
+It is recommendded to have a group voice chating software to help the game. Audio chating feature is not considered to be implemented so far.
 
 ## Dependency
 * Node.js
@@ -36,5 +36,5 @@ Just change "/guess" to the target path you want to use.
 ## Future Target
 
 * Multi-dictionary support
-* Reconnect feature
+* Re-connection feature
 * Optimized frontend and backend(for better gameflow)
