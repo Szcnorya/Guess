@@ -5,7 +5,7 @@
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
-    "csv-parse": "^2.5.0",
+    "csv-parse": "^4.4.6",
     "express": "^4.16.3",
     "fs": "^0.0.1-security",
     "should": "^13.2.3",
